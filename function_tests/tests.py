@@ -1,11 +1,12 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-from django.test import LiveServerTestCase
+from django.contrib.staticfiles.testing import StaticLiveServerCase
 
-class NewVisitorTest(LiveServerTestCase):
+class NewVisitorTest(StaticLiveServerCase):
 
     def setUp(self):
         self.browser = webdriver.Firefox()
+        self.browser.implicitly_wait(3)
 
     def tearDown(self):
         self.browser.quit()
@@ -14,9 +15,18 @@ class NewVisitorTest(LiveServerTestCase):
         table = self.browser.find_element_by_id('id_list_table')
         rows = table.find_element_by_tag_name('tr')
         self.assertIn(row_text, [row.text for row in rows])
-
+        
+    def test_layout_and_styling(self):
+        self.browser.get(self.live_server_url)
+        self.browser.set_window_size(1024, 768)
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        self.assertAlmostEqual(
+                inputbox.loaction['x'] + inputbox.size['width']/2,
+                512,
+                delta = 5)
+"""
     def test_can_start_a_list_and_retrieve_it_later(self):
-        self.browser.get('localhost:8000')
+        self.browser.get('self.live_server_url')
 
         self.assertIn('To-Do lists', self.browser.title)
         header_text = self.browser.find_element_by_tag_name('h1').text
@@ -52,6 +62,8 @@ class NewVisitorTest(LiveServerTestCase):
 
 
         self.fail('Finish the test!')
+"""
+    
 
 
 
